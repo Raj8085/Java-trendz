@@ -1,7 +1,6 @@
 const express = require("express");
 require("dotenv").config();
 const connectDB = require("./config/db")
-connectDB();
 const cloudinary = require('cloudinary').v2;
 const upload = require('./config/multerConfig');
 const blogRoutes = require('./routes/blogRoutes');
@@ -11,10 +10,7 @@ const app = express();
 const port = process.env.PORT
 app.use(express.json())
 
-app.use('/api/blog-posts', blogRoutes);
-app.use('/api/images', imageRoutes);
-
-
+connectDB();
 
 app.use(cors({
   origin: 'http://localhost:3000',  // Frontend running on localhost
@@ -23,15 +19,15 @@ app.use(cors({
   credentials: true  // Allow credentials (cookies, authorization headers, etc.)
 }));
 
-app.options('*', cors()); 
+// app.options('*', cors()); 
 
-app.options('*', (req, res) => {
-    console.log('Preflight request received:', req.headers);
-    res.header('Access-Control-Allow-Origin', 'http://localhost:3000');
-    res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE');
-    res.header('Access-Control-Allow-Headers', 'Content-Type,Authorization');
-    res.sendStatus(200);
-  });
+// app.options('*', (req, res) => {
+//     console.log('Preflight request received:', req.headers);
+//     res.header('Access-Control-Allow-Origin', 'http://localhost:3000');
+//     res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE');
+//     res.header('Access-Control-Allow-Headers', 'Content-Type,Authorization');
+//     res.sendStatus(200);
+//   });
   
 
 cloudinary.config({
@@ -39,6 +35,9 @@ cloudinary.config({
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
+
+app.use('/api/blog-posts', blogRoutes);
+app.use('/api/images', imageRoutes);
 
 app.post('/upload', upload.single('image'), async (req, res) => {
   try {
