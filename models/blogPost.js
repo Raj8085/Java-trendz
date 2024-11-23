@@ -10,7 +10,8 @@ const blogPostSchema = new mongoose.Schema({
   },
   lastUpdate: { type: Date, default: Date.now },
   createdAt: { type: Date, default: Date.now },
-  content: { type: String, required: true }
+  content: { type: String, required: true },
+  image: { type: mongoose.Schema.Types.ObjectId, ref: 'Image' }
 });
 
 const BlogPost = mongoose.model('BlogPost', blogPostSchema);

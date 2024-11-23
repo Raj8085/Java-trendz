@@ -152,7 +152,6 @@ router.delete('/:id', async (req, res) => {
 
       console.log('Cloudinary Deletion Result:', result);
 
-      // Delete the image document from MongoDB
       await Image.findByIdAndDelete(imageId);
 
       res.status(200).json({ message: 'Image deleted successfully' });
