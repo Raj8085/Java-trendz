@@ -75,14 +75,29 @@ exports.createBlogPost = async (req, res) => {
 //   }
 // };
 
+// exports.getAllBlogPosts = async (req, res) => {
+//   try {
+//     const blogPosts = await BlogPost.find().populate('image'); // Populate image field
+//     res.status(200).json(blogPosts);
+//   } catch (error) {
+//     res.status(500).json({ error: error.message });
+//   }
+// };
+
 exports.getAllBlogPosts = async (req, res) => {
   try {
-    const blogPosts = await BlogPost.find().populate('image'); // Populate image field
+    // Fetch only the fields you need: title, image, slug, and description
+    const blogPosts = await BlogPost.find()
+      .select('title image slug description')
+      .populate('image', 'imageUrl'); 
+
     res.status(200).json(blogPosts);
   } catch (error) {
+    console.error('Error fetching blog posts:', error);
     res.status(500).json({ error: error.message });
   }
 };
+
 
 
 
