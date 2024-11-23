@@ -14,7 +14,6 @@ app.use(express.json())
 app.use('/api/blog-posts', blogRoutes);
 app.use('/api/images', imageRoutes);
 
-app.use()
 
 
 app.use(cors({
