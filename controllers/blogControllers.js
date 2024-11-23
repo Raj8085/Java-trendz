@@ -101,36 +101,103 @@ exports.getAllBlogPosts = async (req, res) => {
 
 
 
-exports.getBlogPostBySlug = async (req, res) => {
+// exports.getBlogPostBySlug = async (req, res) => {
+//   try {
+//     const blogPost = await BlogPost.findOne({ slug: req.params.slug });
+//     if (!blogPost) return res.status(404).json({ message: 'Blog post not found' });
+//     res.status(200).json(blogPost);
+//   } catch (error) {
+//     res.status(500).json({ error: error.message });
+//   }
+// };
+
+
+exports.getBlogPostById = async (req, res) => {
   try {
-    const blogPost = await BlogPost.findOne({ slug: req.params.slug });
-    if (!blogPost) return res.status(404).json({ message: 'Blog post not found' });
+    // Find the blog post using the unique _id
+    const blogPost = await BlogPost.findById(req.params.id)
+      .populate('image', 'imageUrl'); // Populate image field to include image URL
+
+    if (!blogPost) {
+      return res.status(404).json({ message: 'Blog post not found' });
+    }
+
     res.status(200).json(blogPost);
   } catch (error) {
+    console.error('Error fetching blog post:', error);
     res.status(500).json({ error: error.message });
   }
 };
 
-exports.updateBlogPost = async (req, res) => {
+
+// exports.updateBlogPost = async (req, res) => {
+//   try {
+//     const blogPost = await BlogPost.findOneAndUpdate(
+//       { slug: req.params.slug },
+//       req.body,
+//       { new: true }
+//     );
+//     if (!blogPost) return res.status(404).json({ message: 'Blog post not found' });
+//     res.status(200).json(blogPost);
+//   } catch (error) {
+//     res.status(400).json({ error: error.message });
+//   }
+// };
+
+// exports.deleteBlogPost = async (req, res) => {
+//   try {
+//     const blogPost = await BlogPost.findOneAndDelete({ slug: req.params.slug });
+//     if (!blogPost) return res.status(404).json({ message: 'Blog post not found' });
+//     res.status(200).json({ message: 'Blog post deleted successfully' });
+//   } catch (error) {
+//     res.status(500).json({ error: error.message });
+//   }
+// };
+
+exports.updateBlogPostById = async (req, res) => {
   try {
-    const blogPost = await BlogPost.findOneAndUpdate(
-      { slug: req.params.slug },
-      req.body,
-      { new: true }
+    // Find and update the blog post using its unique _id
+    const blogPost = await BlogPost.findByIdAndUpdate(
+      req.params.id, // Use the `id` from request parameters
+      req.body, // Data to update
+      { new: true, runValidators: true } // Return updated document and apply schema validations
     );
-    if (!blogPost) return res.status(404).json({ message: 'Blog post not found' });
-    res.status(200).json(blogPost);
+
+    if (!blogPost) {
+      return res.status(404).json({ message: 'Blog post not found' });
+    }
+
+    res.status(200).json({
+      message: 'Blog post updated successfully',
+      data: blogPost,
+    });
   } catch (error) {
+    console.error('Error updating blog post:', error);
     res.status(400).json({ error: error.message });
   }
 };
 
-exports.deleteBlogPost = async (req, res) => {
+
+
+
+exports.deleteBlogPostById = async (req, res) => {
   try {
-    const blogPost = await BlogPost.findOneAndDelete({ slug: req.params.slug });
-    if (!blogPost) return res.status(404).json({ message: 'Blog post not found' });
+    // Find and delete the blog post using its unique _id
+    const blogPost = await BlogPost.findByIdAndDelete(req.params.id);
+
+    if (!blogPost) {
+      return res.status(404).json({ message: 'Blog post not found' });
+    }
+
+    // Optional: Delete the associated image from Cloudinary
+    if (blogPost.image) {
+      const cloudinary = require('../config/cloudinaryConfig'); // Adjust path if necessary
+      await cloudinary.uploader.destroy(blogPost.image.toString());
+    }
+
     res.status(200).json({ message: 'Blog post deleted successfully' });
   } catch (error) {
+    console.error('Error deleting blog post:', error);
     res.status(500).json({ error: error.message });
   }
 };
