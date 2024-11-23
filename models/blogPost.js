@@ -12,7 +12,8 @@ const blogPostSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now },
   content: { type: String, required: true },
   description : { type : String,required : true},
-  image: { type: mongoose.Schema.Types.ObjectId, ref: 'Image' }
+  // image: { type: mongoose.Schema.Types.ObjectId, ref: 'Image' }
+  image : {type : String, required : true}
 });
 
 const BlogPost = mongoose.model('BlogPost', blogPostSchema);
