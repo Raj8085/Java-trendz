@@ -13,9 +13,9 @@ app.use(express.json())
 connectDB();
 
 app.use(cors({
-  origin: 'http://localhost:5173',  // Frontend running on localhost
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],  // Allowed methods
-  allowedHeaders: ['Content-Type', 'Authorization'],  // Allowed headers
+  origin: 'http://localhost:5173',  
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],  
+  allowedHeaders: ['Content-Type', 'Authorization'],  
   credentials: true  // Allow credentials (cookies, authorization headers, etc.)
 }));
 

@@ -13,7 +13,12 @@ const blogPostSchema = new mongoose.Schema({
   content: { type: String, required: true },
   description : { type : String,required : true},
   // image: { type: mongoose.Schema.Types.ObjectId, ref: 'Image' }
-  image : {type : String, required : true}
+  image : {type : String, required : true},
+  socialMedia: {
+    instagram: { type: String, required: false },  
+    facebook: { type: String, required: false },   
+    x: { type: String, required: false }  
+  }
 });
 
 const BlogPost = mongoose.model('BlogPost', blogPostSchema);

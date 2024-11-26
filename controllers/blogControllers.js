@@ -29,22 +29,19 @@ const Image = require('../models/image');
 
 exports.createBlogPost = async (req, res) => {
   try {
-    const { imageId, ...blogData } = req.body; // Destructure imageId and other blog data
+    const { imageId, ...blogData } = req.body; 
 
-    // Validate the provided image ID
     if (imageId) {
       const image = await Image.findById(imageId);
       if (!image) {
         return res.status(400).json({ message: 'Invalid image ID' });
       }
-      blogData.image = imageId; // Add the valid image ID to the blog data
+      blogData.image = imageId; 
     }
 
-    // Create and save the blog post
     const blogPost = new BlogPost(blogData);
     const savedBlogPost = await blogPost.save();
 
-    // Format the creation date
     const createdAt = new Date(savedBlogPost.createdAt);
     const formattedDate = {
       date: createdAt.getDate(),
@@ -86,7 +83,6 @@ exports.createBlogPost = async (req, res) => {
 
 exports.getAllBlogPosts = async (req, res) => {
   try {
-    // Fetch only the fields you need: title, image, slug, and description
     const blogPosts = await BlogPost.find()
       .select('title image slug description')
       .populate('image', 'imageUrl'); 
@@ -114,9 +110,8 @@ exports.getAllBlogPosts = async (req, res) => {
 
 exports.getBlogPostById = async (req, res) => {
   try {
-    // Find the blog post using the unique _id
     const blogPost = await BlogPost.findById(req.params.id)
-      .populate('image', 'imageUrl'); // Populate image field to include image URL
+      .populate('image', 'imageUrl');
 
     if (!blogPost) {
       return res.status(404).json({ message: 'Blog post not found' });
@@ -156,11 +151,10 @@ exports.getBlogPostById = async (req, res) => {
 
 exports.updateBlogPostById = async (req, res) => {
   try {
-    // Find and update the blog post using its unique _id
     const blogPost = await BlogPost.findByIdAndUpdate(
-      req.params.id, // Use the `id` from request parameters
-      req.body, // Data to update
-      { new: true, runValidators: true } // Return updated document and apply schema validations
+      req.params.id, 
+      req.body, 
+      { new: true, runValidators: true } 
     );
 
     if (!blogPost) {
@@ -182,16 +176,14 @@ exports.updateBlogPostById = async (req, res) => {
 
 exports.deleteBlogPostById = async (req, res) => {
   try {
-    // Find and delete the blog post using its unique _id
     const blogPost = await BlogPost.findByIdAndDelete(req.params.id);
 
     if (!blogPost) {
       return res.status(404).json({ message: 'Blog post not found' });
     }
 
-    // Optional: Delete the associated image from Cloudinary
     if (blogPost.image) {
-      const cloudinary = require('../config/cloudinaryConfig'); // Adjust path if necessary
+      const cloudinary = require('../config/cloudinaryConfig');
       await cloudinary.uploader.destroy(blogPost.image.toString());
     }
 
@@ -201,3 +193,25 @@ exports.deleteBlogPostById = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+
+exports.getPaginatedBlogPosts = async(req,res)=>{
+  try {
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 10;
+      const skip = (page - 1) * limit;
+      const blogPosts = await BlogPost.find().skip(skip).limit(limit);
+      const totalPosts = await BlogPost.countDocuments();
+      const totalPages = Math.ceil(totalPosts / limit);
+      res.json({
+          page,
+          limit,
+          totalPosts,
+          totalPages,
+          blogPosts
+      });        
+  } catch (error) {
+      console.log(err);
+      res.status(500).json({error : "Failed to fetch blog posts"})
+  }
+}

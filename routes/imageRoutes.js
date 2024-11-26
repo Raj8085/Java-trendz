@@ -137,14 +137,11 @@ router.post('/upload', upload.single('image'), async (req, res) => {
 router.delete('/:id', async (req, res) => {
   try {
     const imageId = req.params.id;
-
-    // Find the image in MongoDB
     const image = await Image.findById(imageId);
     if (!image) {
       return res.status(404).json({ message: 'Image not found' });
     }
 
-    // Delete the image from Cloudinary
     cloudinary.uploader.destroy(image.publicId, async (error, result) => {
       if (error) {
         console.error('Cloudinary Deletion Error:', error.message);
